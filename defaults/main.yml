@@ -1,2 +1,3 @@
 # defaults/main.yml
 ---
+users_add: []

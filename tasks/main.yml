@@ -1,2 +1,32 @@
 # tasks/main.yml
 ---
+- name: Validate that all users have a valid name
+  ansible.builtin.assert:
+    that:
+      - "(item.name | default(item)) | string | length > 0"
+      - "(item.name | default(item)) is match('^[a-z][a-z0-9_-]*$')"
+    fail_msg: >
+      Each user must start with a lowercase letter, followed by
+      lowercase letters, digits, underscores, or dashes.
+  loop: "{{ users_add }}"
+  loop_control:
+    label: "{{ item.name | default(item) }}"
+  tags:
+    - users
+    - users_add
+    - validate
+
+
+- name: Add users
+  ansible.builtin.user:
+    name: "{{ item.name | default(item) }}"
+    comment: "{{ item.comment | default('') }}"
+    createhome: true
+    groups: "{{ item.groups | default([]) | join(',') }}"
+    home: "{{ item.home | default('/home/' ~ (item.name | default(item))) }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    state: present
+  loop: "{{ users_add }}"
+  tags:
+    - users
+    - users_add
