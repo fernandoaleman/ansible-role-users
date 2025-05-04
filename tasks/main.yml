@@ -60,3 +60,12 @@
     - users
     - users_add
     - ssh_keys
+
+- name: Delete users
+  ansible.builtin.user:
+    name: "{{ item.name | default(item) }}"
+    state: absent
+  loop: "{{ users_del }}"
+  tags:
+    - users
+    - users_del

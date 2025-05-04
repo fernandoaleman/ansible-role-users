@@ -1,3 +1,5 @@
 # defaults/main.yml
 ---
 users_add: []
+
+users_del: []

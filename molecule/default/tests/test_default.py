@@ -45,3 +45,12 @@ def test_authorized_keys_file_exists_and_contents(host, test_users_add):
         content = f.content_string.strip().splitlines()
         for key in user["ssh_keys"]:
             assert key in content, f"Key missing from {path}:\n{key}"
+
+
+def test_users_are_deleted(host, test_users_del):
+    for user in test_users_del:
+        u = host.user(user["name"])
+        h = host.file(f"/home/{user['name']}")
+
+        assert not u.exists
+        assert not h.exists

@@ -3,6 +3,11 @@
 - name: Converge
   hosts: all
 
+  vars:
+    users_del:
+      - username: johndoe
+      - username: janedoe
+
   pre_tasks:
     - name: Update apt cache
       ansible.builtin.apt:

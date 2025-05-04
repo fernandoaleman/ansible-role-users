@@ -20,6 +20,11 @@ USERS_ADD = [
     "foo",
 ]
 
+USERS_DEL = [
+    "johndoe",
+    "janedoe",
+]
+
 
 @pytest.fixture
 def test_users_add():
@@ -45,5 +50,20 @@ def test_users_add():
             user_dict["ssh_keys"] = ssh_keys
 
         normalized.append(user_dict)
+
+    return normalized
+
+
+@pytest.fixture
+def test_users_del():
+    normalized = []
+
+    for user in USERS_DEL:
+        if isinstance(user, str):
+            name = user
+        else:
+            name = user["name"]
+
+        normalized.append({"name": name})
 
     return normalized
