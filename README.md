@@ -1,8 +1,13 @@
-# Ansible Role users
+# Ansible Role: Users
 
 [![CI](https://github.com/1000Bulbs/ansible-role-users/actions/workflows/ci.yml/badge.svg)](https://github.com/1000Bulbs/ansible-role-users/actions/workflows/ci.yml)
 
-A brief description of the role goes here.
+This role manages Linux user accounts including:
+
+- Creating users with default or custome shell/home/group
+- Validating username formatting
+- Managing SSH keys
+- Removing users when needed
 
 ## Requirements
 
@@ -16,7 +21,8 @@ These variables can be defined in your inventory, playbooks, or group_vars:
 
 ### Default Variables
 
-Add a list of default variables that are defined in the role's `defaults/main.yml` file.
+- **`users_add`**: Default = `[]`
+- **`users_del`**: Default = `[]`
 
 ### Other Role Variables
 
@@ -24,8 +30,7 @@ _No variables defined._
 
 ## Dependencies
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be
-set for other roles, or variables that are used from other roles.
+_No dependencies defined._
 
 ## Installing the Role via `ansible-galaxy`
 
@@ -33,7 +38,7 @@ To include this role in your project using a `requirements.yml` file:
 
 ```yaml
 roles:
-  - name: users
+  - name: okb.users
     src: git@github.com:1000bulbs/ansible-role-users.git
     scm: git
     version: master
@@ -49,15 +54,36 @@ This will install the role under `~/.ansible/roles/users` by default, or to the 
 
 ## Example Playbook
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for
-users too:
-
 ```yaml
-- name: My Playbook
+- name: Manage users
   hosts: all
   become: true
   roles:
-    - role: users
+    - role: okb.users
+      vars:
+        users_add:
+          - name: deploy
+            shell: /bin/bash
+            ssh_keys:
+              - "ssh-ed25519 AAAAC3N... user1@domain.com"
+              - "ssh-ed25519 AAAAC3N... user2@domain.com"
+          - name: devops
+            groups: ["sudo"]
+            ssh_keys:
+              - "ssh-ed25519 AAAAC3N... user1@domain.com"
+
+        users_del:
+          - olduser
+```
+
+## Deleting Users
+
+To delete users, provide a `users_del` list:
+
+```yaml
+users_del:
+  - user1
+  - user2
 ```
 
 ## Testing
