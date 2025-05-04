@@ -30,3 +30,33 @@
   tags:
     - users
     - users_add
+
+- name: Ensure ~/.ssh directory exists for users with ssh_keys
+  ansible.builtin.file:
+    path: "{{ item.home | default('/home/' + item.name) }}/.ssh"
+    state: directory
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: "0700"
+  loop: "{{ users_add }}"
+  when: item.ssh_keys is defined
+  tags:
+    - users
+    - users_add
+    - ssh_keys
+
+- name: Create authorized_keys file from template
+  ansible.builtin.template:
+    src: authorized_keys.j2
+    dest: "{{ item.home | default('/home/' + item.name) }}/.ssh/authorized_keys"
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: "0600"
+  loop: "{{ users_add }}"
+  when: item.ssh_keys is defined
+  vars:
+    ssh_keys: "{{ item.ssh_keys }}"
+  tags:
+    - users
+    - users_add
+    - ssh_keys

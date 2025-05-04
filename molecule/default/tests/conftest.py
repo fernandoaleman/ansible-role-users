@@ -2,8 +2,21 @@
 import pytest
 
 USERS_ADD = [
-    {"name": "deploy"},
-    {"name": "devops", "groups": ["sudo"]},
+    {
+        "name": "deploy",
+        "ssh_keys": [
+            "ssh-ed25519 AAAAC3NzaC1 user1@email.com",
+            "ssh-ed25519 AAAAC3NzaC2 user2@email.com",
+            "ssh-ed25519 AAAAC3NzaC3 user3@email.com",
+        ],
+    },
+    {
+        "name": "devops",
+        "groups": ["sudo"],
+        "ssh_keys": [
+            "ssh-ed25519 AAAAC3NzaC1 user1@email.com",
+        ],
+    },
     "foo",
 ]
 
@@ -19,13 +32,18 @@ def test_users_add():
         else:
             name = user["name"]
 
-        normalized.append(
-            {
-                "name": name,
-                "home": user.get("home", f"/home/{name}"),
-                "shell": user.get("shell", "/bin/bash"),
-                "groups": user.get("groups", []),
-            }
-        )
+        user_dict = {
+            "name": name,
+            "home": user.get("home", f"/home/{name}"),
+            "shell": user.get("shell", "/bin/bash"),
+            "groups": user.get("groups", []),
+        }
+
+        # Only add ssh_keys if it exists and is non-empty
+        ssh_keys = user.get("ssh_keys", [])
+        if ssh_keys:
+            user_dict["ssh_keys"] = ssh_keys
+
+        normalized.append(user_dict)
 
     return normalized
